@@ -6,8 +6,8 @@ import { useLanguage } from '../LayoutClient'
 import { TRANSLATIONS, COUNTRY_NAMES, REGION_NAMES } from '../translations'
 import NetworkGraph from './NetworkGraph'
 
-// API base URL
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8005'
+// API base URL - Production Railway URL
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://wwai-gnn-api-production.up.railway.app'
 
 // Impact variable options for toggle pills
 const IMPACT_VARIABLES = [
@@ -209,7 +209,36 @@ export default function SpilloversContent() {
       }
 
       const data = await response.json()
-      setSimulationResult(data)
+
+      // Transform API response to match frontend expected format
+      if (data.success && data.simulation) {
+        const sim = data.simulation
+        const finalImpacts = sim.final_impacts || {}
+
+        // Convert final_impacts object to array format
+        const impacts: ImpactData[] = Object.entries(finalImpacts).map(([country, values]: [string, any]) => ({
+          country,
+          gdp_growth_rate: (values.gdp_growth_rate || 0) * 100,
+          inflation_rate: (values.inflation_rate || 0) * 100,
+          unemployment_rate: (values.unemployment_rate || 0) * 100,
+          interest_rate: (values.interest_rate || 0) * 100,
+          trade_balance: (values.trade_balance || 0) * 100,
+        }))
+
+        const transformed: SimulationResult = {
+          impacts,
+          metadata: {
+            shock_country: sim.origin_country,
+            shock_variable: sim.shock_variable,
+            shock_magnitude: sim.shock_magnitude,
+            message_passing_steps: sim.num_steps,
+            model_r2: 0.9949,
+          }
+        }
+        setSimulationResult(transformed)
+      } else {
+        throw new Error('Invalid API response')
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to run simulation')
     } finally {
