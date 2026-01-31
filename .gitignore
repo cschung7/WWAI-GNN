@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Node/Next.js
+node_modules/
+.next/
+out/
+.pnp
+.pnp.js
+
+# Environment
+.env
+.env.local
+.env*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Data (large files)
+data/cache/
+data/checkpoints/
+*.pkl
+*.h5
+*.pt
+*.pth
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo

@@ -1,0 +1,125 @@
+# WWAI-GNN Configuration
+# GraphEconCast: GNN-based Economic Forecasting
+
+# Model Architecture
+model:
+  latent_size: 256
+  mlp_hidden_size: 256
+  mlp_num_hidden_layers: 2
+  num_message_passing_steps: 8
+  num_processor_repetitions: 1
+  use_layer_norm: true
+  activation: "swish"
+  f32_aggregation: true
+
+# Task Configuration
+task:
+  input_features:
+    - gdp_growth_rate
+    - inflation_rate
+    - unemployment_rate
+    - interest_rate
+    - trade_balance
+  target_features:
+    - gdp_growth_rate
+    - inflation_rate
+    - unemployment_rate
+    - interest_rate
+    - trade_balance
+  static_features:
+    - latitude
+    - longitude
+    - development_level
+  num_input_timesteps: 4  # Quarters of historical data
+
+# Training Configuration
+training:
+  learning_rate: 0.001
+  weight_decay: 0.00001
+  warmup_steps: 100
+  max_grad_norm: 1.0
+  num_epochs: 100
+  batch_size: 8
+  eval_every: 10
+  save_every: 20
+  n_timesteps: 4
+  train_val_split: 0.8
+  loss_type: mse
+  per_variable_weights:
+    gdp_growth_rate: 2.0
+    inflation_rate: 2.0
+    unemployment_rate: 1.5
+    interest_rate: 1.0
+    trade_balance: 1.0
+
+# Data Configuration
+data:
+  start_date: "2000-01-01"
+  use_cache: true
+  cache_dir: "data/cache"
+
+# Countries (26 major economies)
+countries:
+  - USA  # United States
+  - CHN  # China
+  - JPN  # Japan
+  - DEU  # Germany
+  - IND  # India
+  - GBR  # United Kingdom
+  - FRA  # France
+  - ITA  # Italy
+  - BRA  # Brazil
+  - CAN  # Canada
+  - KOR  # South Korea
+  - ESP  # Spain
+  - AUS  # Australia
+  - RUS  # Russia
+  - MEX  # Mexico
+  - IDN  # Indonesia
+  - NLD  # Netherlands
+  - SAU  # Saudi Arabia
+  - TUR  # Turkey
+  - CHE  # Switzerland
+  - POL  # Poland
+  - SWE  # Sweden
+  - BEL  # Belgium
+  - ARG  # Argentina
+  - NOR  # Norway
+  - AUT  # Austria
+
+# Graph Configuration
+graph:
+  k_trade: 10           # Top-k trade partners per country
+  k_similar: 5          # Top-k similar countries
+  distance_threshold_km: 2000.0  # Max distance for geographic edges
+
+# Paths
+paths:
+  checkpoint_dir: "data/checkpoints"
+  log_dir: "data/logs"
+  cache_dir: "data/cache"
+
+# Economic Indicators (FRED and World Bank codes)
+indicators:
+  gdp_growth:
+    fred: "A191RL1Q225SBEA"
+    world_bank: "NY.GDP.MKTP.KD.ZG"
+    description: "Real GDP growth rate (quarterly)"
+
+  inflation:
+    fred: "CPIAUCSL"
+    world_bank: "FP.CPI.TOTL.ZG"
+    description: "Consumer Price Index inflation rate"
+
+  unemployment:
+    fred: "UNRATE"
+    world_bank: "SL.UEM.TOTL.ZS"
+    description: "Unemployment rate"
+
+  interest_rate:
+    fred: "FEDFUNDS"
+    description: "Central bank policy rate"
+
+  trade_balance:
+    world_bank: "BN.GSR.GNFS.CD"
+    description: "Trade balance (goods and services)"
