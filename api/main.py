@@ -184,6 +184,7 @@ async def get_model_info():
 
 
 @app.post("/api/gnn/simulate-shock")
+@app.post("/api/gnn/simulate")  # Alias for frontend compatibility
 async def simulate_shock(request: ShockRequest):
     """Simulate shock propagation through economic network.
 
