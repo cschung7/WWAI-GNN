@@ -7,7 +7,7 @@ import { TRANSLATIONS, COUNTRY_NAMES, REGION_NAMES } from '../translations'
 import NetworkGraph from './NetworkGraph'
 
 // API base URL - Production Railway URL
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://wwai-gnn-api-production.up.railway.app'
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://web-production-5908c.up.railway.app'
 
 // Impact variable options for toggle pills
 const IMPACT_VARIABLES = [
@@ -192,7 +192,7 @@ export default function SpilloversContent() {
     setError(null)
 
     try {
-      const response = await fetch(`${API_BASE}/api/gnn/simulate`, {
+      const response = await fetch(`${API_BASE}/api/gnn/simulate-shock`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -462,11 +462,10 @@ export default function SpilloversContent() {
               <button
                 key={v.id}
                 onClick={() => setImpactVariable(v.id)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  impactVariable === v.id
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${impactVariable === v.id
                     ? 'bg-blue-600 text-white'
                     : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                }`}
+                  }`}
               >
                 {lang === 'ko' ? v.labelKo : v.label} {ui.impact}
               </button>
