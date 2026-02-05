@@ -322,7 +322,7 @@ export default function SpilloversContent() {
         <td class="${row.gdp < 0 ? 'negative' : 'positive'}">${row.gdp > 0 ? '+' : ''}${row.gdp.toFixed(2)}%</td>
         <td class="${row.inflation < 0 ? 'negative' : 'positive'}">${row.inflation > 0 ? '+' : ''}${row.inflation.toFixed(2)}%</td>
         <td class="${row.unemployment > 0 ? 'negative' : 'positive'}">${row.unemployment > 0 ? '+' : ''}${row.unemployment.toFixed(2)}%</td>
-        <td class="${row.interest_rate > 0 ? 'negative' : 'positive'}">${row.interest_rate > 0 ? '+' : ''}${row.interest_rate.toFixed(2)}%</td>
+        <td class="${row.interest_rate > 0 ? 'negative' : 'positive'}">${row.interest_rate > 0 ? '+' : ''}${row.interest_rate.toFixed(2)} bp</td>
       </tr>
     `).join('') || ''}</tbody>
   </table>
@@ -524,7 +524,7 @@ export default function SpilloversContent() {
                             {impact.unemployment_rate > 0 ? '+' : ''}{impact.unemployment_rate.toFixed(2)}%
                           </td>
                           <td className={`py-2 px-3 text-right font-mono ${getImpactColor(impact.interest_rate, 'interest_rate')}`}>
-                            {impact.interest_rate > 0 ? '+' : ''}{impact.interest_rate.toFixed(2)}%
+                            {impact.interest_rate > 0 ? '+' : ''}{impact.interest_rate.toFixed(2)} bp
                           </td>
                         </tr>
                       ))}
@@ -619,7 +619,7 @@ export default function SpilloversContent() {
                           {row.unemployment > 0 ? '+' : ''}{row.unemployment.toFixed(2)}%
                         </td>
                         <td className={`py-2 px-2 text-right font-mono ${row.interest_rate > 0 ? 'text-orange-400' : 'text-cyan-400'}`}>
-                          {row.interest_rate > 0 ? '+' : ''}{row.interest_rate.toFixed(2)}%
+                          {row.interest_rate > 0 ? '+' : ''}{row.interest_rate.toFixed(2)} bp
                         </td>
                       </tr>
                     ))}
