@@ -192,7 +192,10 @@ export default function SpilloversContent() {
     setError(null)
 
     try {
-      const response = await fetch(`${API_BASE}/api/gnn/simulate-shock`, {
+      // Force rebuild: 2026-02-05 20:15 KST
+      const apiUrl = `${API_BASE}/api/gnn/simulate-shock`
+      console.log('Calling API:', apiUrl)
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
