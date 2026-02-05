@@ -6,7 +6,7 @@ import { useLanguage } from '../LayoutClient'
 import { TRANSLATIONS, COUNTRY_NAMES, REGION_NAMES } from '../translations'
 import NetworkGraph from './NetworkGraph'
 
-// API base URL - Production Railway URL
+// API base URL - Production Railway URL (Updated 2026-02-05)
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://web-production-5908c.up.railway.app'
 
 // Impact variable options for toggle pills
