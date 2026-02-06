@@ -1,6 +1,8 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { AuthProvider, useAuth } from './context/AuthContext'
+import LoginPage from './login/page'
 
 // Language type
 export type Language = 'en' | 'ko'
@@ -21,6 +23,7 @@ const NAV_TRANSLATIONS = {
     generateReport: 'Generate Report',
     countries: '26 Countries',
     indicators: '5 Indicators',
+    logout: 'Logout',
   },
   ko: {
     navigation: '메뉴',
@@ -36,6 +39,7 @@ const NAV_TRANSLATIONS = {
     generateReport: '보고서 작성',
     countries: '26개국',
     indicators: '5개 지표',
+    logout: '로그아웃',
   },
 } as const
 
@@ -58,8 +62,18 @@ export function useLanguage() {
 
 // Layout client component
 export function LayoutClient({ children }: { children: ReactNode }) {
+  return (
+    <AuthProvider>
+      <LayoutContent>{children}</LayoutContent>
+    </AuthProvider>
+  )
+}
+
+// Inner layout component that uses auth
+function LayoutContent({ children }: { children: ReactNode }) {
   const [lang, setLang] = useState<Language>('en')
   const [mounted, setMounted] = useState(false)
+  const { isAuthenticated, logout } = useAuth()
 
   // Load language from localStorage on mount
   useEffect(() => {
@@ -69,6 +83,15 @@ export function LayoutClient({ children }: { children: ReactNode }) {
     }
     setMounted(true)
   }, [])
+
+  // Show login page if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <LanguageContext.Provider value={{ lang: 'en', setLang: () => {} }}>
+        <LoginPage />
+      </LanguageContext.Provider>
+    )
+  }
 
   // Save language to localStorage when changed
   const handleSetLang = (newLang: Language) => {
@@ -135,6 +158,16 @@ export function LayoutClient({ children }: { children: ReactNode }) {
               <span className="text-sm opacity-70 hidden md:inline">
                 {t.countries} | {t.indicators}
               </span>
+              {/* Logout Button */}
+              <button
+                className="btn btn-ghost btn-xs"
+                onClick={logout}
+                title={t.logout}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+                </svg>
+              </button>
             </div>
           </div>
           {/* Main Content */}
