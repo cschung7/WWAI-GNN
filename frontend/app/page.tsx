@@ -115,7 +115,7 @@ export default function Dashboard() {
       <div className="card bg-base-100">
         <div className="card-body">
           <h2 className="card-title text-xl mb-4">{t.economicIndicators}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <div className="bg-base-200 rounded-lg p-4">
               <div className="text-lg font-semibold">{t.gdpGrowth}</div>
               <div className="text-sm opacity-70 mt-1">{t.gdpDesc}</div>
@@ -134,6 +134,11 @@ export default function Dashboard() {
             <div className="bg-base-200 rounded-lg p-4">
               <div className="text-lg font-semibold">{t.interestRate}</div>
               <div className="text-sm opacity-70 mt-1">{t.interestRateDesc}</div>
+              <div className="badge badge-outline mt-2">%</div>
+            </div>
+            <div className="bg-base-200 rounded-lg p-4">
+              <div className="text-lg font-semibold">{t.tradeBalance}</div>
+              <div className="text-sm opacity-70 mt-1">{t.tradeBalanceDesc}</div>
               <div className="badge badge-outline mt-2">%</div>
             </div>
           </div>
