@@ -132,9 +132,10 @@ export default function NetworkGraph({
   // UI strings
   const ui = {
     shockOrigin: lang === 'ko' ? '충격 발생국' : 'Shock Origin',
-    negativeImpact: lang === 'ko' ? '부정적 영향' : 'Negative Impact',
-    positiveImpact: lang === 'ko' ? '긍정적 영향' : 'Positive Impact',
-    unaffected: lang === 'ko' ? '영향 없음' : 'Unaffected',
+    strongNegative: lang === 'ko' ? '강한 부정적' : 'Strong Negative',
+    negativeImpact: lang === 'ko' ? '부정적 영향' : 'Negative',
+    positiveImpact: lang === 'ko' ? '긍정적 영향' : 'Positive',
+    nearZero: lang === 'ko' ? '미미한 영향' : 'Near Zero',
     dragTip: lang === 'ko' ? '드래그: 이동 • 스크롤: 확대/축소' : 'Drag to pan • Scroll to zoom',
   }
 
@@ -157,6 +158,22 @@ export default function NetworkGraph({
   }, [simulationResult, impactVariable])
 
   const impacts = getImpacts()
+
+  // Get impact color matching the table's getImpactColor thresholds
+  const getImpactColor = useCallback((value: number, dark = false): string => {
+    if (impactVariable === 'unemployment_rate') {
+      // Higher unemployment is bad
+      if (value > 0.5) return dark ? '#dc2626' : '#f87171'   // red (strong negative)
+      if (value > 0.1) return dark ? '#ea580c' : '#fb923c'   // orange (moderate negative)
+      if (value < -0.1) return dark ? '#16a34a' : '#4ade80'  // green (positive)
+      return dark ? '#64748b' : '#94a3b8'                     // slate (near-zero)
+    }
+    // For GDP, inflation, interest_rate: lower is bad
+    if (value < -1) return dark ? '#dc2626' : '#f87171'       // red (strong negative)
+    if (value < -0.3) return dark ? '#ea580c' : '#fb923c'     // orange (moderate negative)
+    if (value > 0.3) return dark ? '#16a34a' : '#4ade80'      // green (positive)
+    return dark ? '#64748b' : '#94a3b8'                       // slate (near-zero)
+  }, [impactVariable])
 
   // Initialize nodes
   useEffect(() => {
@@ -432,7 +449,7 @@ export default function NetworkGraph({
                 y1={shockNode.y}
                 x2={node.x}
                 y2={node.y}
-                stroke={impact.value < 0 ? '#ef4444' : '#22c55e'}
+                stroke={getImpactColor(impact.value, true)}
                 strokeWidth={Math.min(3, Math.abs(impact.value) * 2)}
                 strokeOpacity={0.3}
                 strokeDasharray="4,4"
@@ -451,8 +468,7 @@ export default function NetworkGraph({
 
             let fillColor = REGION_COLORS[node.region] || '#475569'
             if (isShockOrigin) fillColor = '#dc2626'
-            else if (impact && impact.value < 0) fillColor = '#f97316'
-            else if (impact && impact.value > 0) fillColor = '#22c55e'
+            else if (impact) fillColor = getImpactColor(impact.value)
 
             return (
               <g
@@ -506,7 +522,7 @@ export default function NetworkGraph({
                     cy={node.y}
                     r={radius + 6}
                     fill="none"
-                    stroke={impact.value < 0 ? '#f97316' : '#22c55e'}
+                    stroke={getImpactColor(impact.value)}
                     strokeWidth={2}
                     opacity={0.6}
                   >
@@ -554,7 +570,7 @@ export default function NetworkGraph({
                       width={36}
                       height={16}
                       rx={8}
-                      fill={impact.value < 0 ? '#dc2626' : '#16a34a'}
+                      fill={getImpactColor(impact.value, true)}
                     />
                     <text
                       x={node.x + radius + 13}
@@ -577,22 +593,26 @@ export default function NetworkGraph({
 
       {/* Legend */}
       <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-wrap gap-4 text-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-full bg-red-600 ring-2 ring-red-400/50"></div>
+        <div className="flex flex-wrap gap-3 text-sm">
+          <div className="flex items-center gap-1.5">
+            <div className="w-4 h-4 rounded-full bg-red-600 ring-2 ring-red-400/50"></div>
             <span className="text-slate-300">{ui.shockOrigin}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-full bg-orange-500 ring-2 ring-orange-400/50"></div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-4 h-4 rounded-full bg-red-400 ring-2 ring-red-300/50"></div>
+            <span className="text-slate-300">{ui.strongNegative}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-4 h-4 rounded-full bg-orange-400 ring-2 ring-orange-300/50"></div>
             <span className="text-slate-300">{ui.negativeImpact}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-full bg-green-500 ring-2 ring-green-400/50"></div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-4 h-4 rounded-full bg-green-400 ring-2 ring-green-300/50"></div>
             <span className="text-slate-300">{ui.positiveImpact}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-full bg-slate-500"></div>
-            <span className="text-slate-300">{ui.unaffected}</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-4 h-4 rounded-full bg-slate-400"></div>
+            <span className="text-slate-300">{ui.nearZero}</span>
           </div>
         </div>
         <div className="text-xs text-slate-500">

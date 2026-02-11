@@ -157,11 +157,15 @@ export default function SpilloversContent() {
     steps: lang === 'ko' ? '전파 단계' : 'Propagation Steps',
   }
 
-  // State
-  const [shockCountry, setShockCountry] = useState(searchParams.get('country') || 'USA')
-  const [shockVariable, setShockVariable] = useState(searchParams.get('variable') || 'interest_rate')
+  // State - validate URL params against known values
+  const urlCountry = searchParams.get('country')
+  const urlVariable = searchParams.get('variable')
+  const validCountry = COUNTRIES.some(c => c.code === urlCountry) ? urlCountry! : 'USA'
+  const validVariable = FEATURES.some(f => f.id === urlVariable) ? urlVariable! : 'interest_rate'
+  const [shockCountry, setShockCountry] = useState(validCountry)
+  const [shockVariable, setShockVariable] = useState(validVariable)
   const [shockMagnitude, setShockMagnitude] = useState(
-    Number(searchParams.get('magnitude')) || FEATURES.find(f => f.id === 'interest_rate')?.defaultValue || 50
+    Number(searchParams.get('magnitude')) || FEATURES.find(f => f.id === validVariable)?.defaultValue || 50
   )
   const [impactVariable, setImpactVariable] = useState('gdp_growth_rate')
   const [loading, setLoading] = useState(false)
@@ -169,6 +173,7 @@ export default function SpilloversContent() {
   const [simulationResult, setSimulationResult] = useState<SimulationResult | null>(null)
 
   // Report modal state
+  const [networkExpanded, setNetworkExpanded] = useState(false)
   const [showReportModal, setShowReportModal] = useState(false)
   const [reportData, setReportData] = useState<any>(null)
   const [reportLoading, setReportLoading] = useState(false)
@@ -476,21 +481,34 @@ export default function SpilloversContent() {
           </div>
         </div>
 
-        {/* Results Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Network Graph */}
-          <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
-            <h2 className="text-xl font-semibold text-white mb-4">{ui.networkTitle}</h2>
-            <NetworkGraph
-              simulationResult={simulationResult}
-              impactVariable={impactVariable}
-              shockCountry={shockCountry}
-              lang={lang}
-            />
-          </div>
+        {/* Network Graph - Expandable */}
+        <div className="mb-6 bg-slate-800/50 rounded-xl border border-slate-700">
+          <button
+            onClick={() => setNetworkExpanded(prev => !prev)}
+            className="w-full flex items-center justify-between p-6 text-left hover:bg-slate-700/30 rounded-xl transition-colors"
+          >
+            <h2 className="text-xl font-semibold text-white">{ui.networkTitle}</h2>
+            <svg
+              className={`w-5 h-5 text-slate-400 transition-transform duration-200 ${networkExpanded ? 'rotate-180' : ''}`}
+              fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          {networkExpanded && (
+            <div className="px-6 pb-6">
+              <NetworkGraph
+                simulationResult={simulationResult}
+                impactVariable={impactVariable}
+                shockCountry={shockCountry}
+                lang={lang}
+              />
+            </div>
+          )}
+        </div>
 
-          {/* Impact Table */}
-          <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
+        {/* Impact Table */}
+        <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
             <h2 className="text-xl font-semibold text-white mb-4">{ui.impactTableTitle}</h2>
             {simulationResult ? (
               <div className="overflow-x-auto">
@@ -537,7 +555,6 @@ export default function SpilloversContent() {
               </div>
             )}
           </div>
-        </div>
 
         {/* Model Info */}
         {simulationResult && (
