@@ -6,8 +6,8 @@ import { useLanguage } from '../LayoutClient'
 import { TRANSLATIONS, COUNTRY_NAMES, REGION_NAMES } from '../translations'
 import NetworkGraph from './NetworkGraph'
 
-// API base URL - Production Railway URL (Updated 2026-02-05)
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://web-production-5908c.up.railway.app'
+// API base URL - NAS + Cloudflare Tunnel (Updated 2026-02-13)
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://gnn.wwai.app'
 
 // Impact variable options for toggle pills
 const IMPACT_VARIABLES = [
@@ -177,6 +177,33 @@ export default function SpilloversContent() {
   const [showReportModal, setShowReportModal] = useState(false)
   const [reportData, setReportData] = useState<any>(null)
   const [reportLoading, setReportLoading] = useState(false)
+
+  // Spillover matrix & graph structure for InfraNodus network
+  const [spilloverMatrix, setSpilloverMatrix] = useState<Record<string, Record<string, number>> | null>(null)
+  const [graphStructure, setGraphStructure] = useState<any>(null)
+
+  // Fetch spillover matrix & graph structure on mount
+  useEffect(() => {
+    const fetchGraphData = async () => {
+      try {
+        const [matrixRes, graphRes] = await Promise.all([
+          fetch(`${API_BASE}/api/gnn/spillover-matrix`),
+          fetch(`${API_BASE}/api/gnn/graph-structure`),
+        ])
+        if (matrixRes.ok) {
+          const data = await matrixRes.json()
+          setSpilloverMatrix(data.matrix || null)
+        }
+        if (graphRes.ok) {
+          const data = await graphRes.json()
+          setGraphStructure(data || null)
+        }
+      } catch (err) {
+        console.error('Failed to fetch graph data:', err)
+      }
+    }
+    fetchGraphData()
+  }, [])
 
   // Get current feature config
   const currentFeature = FEATURES.find(f => f.id === shockVariable) || FEATURES[3]
@@ -502,6 +529,8 @@ export default function SpilloversContent() {
                 impactVariable={impactVariable}
                 shockCountry={shockCountry}
                 lang={lang}
+                spilloverMatrix={spilloverMatrix}
+                graphStructure={graphStructure}
               />
             </div>
           )}
