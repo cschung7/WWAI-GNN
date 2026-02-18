@@ -18,11 +18,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Check if user was previously authenticated
-    const authStatus = localStorage.getItem('wwai-gnn-auth')
-    if (authStatus === 'authenticated') {
-      setIsAuthenticated(true)
-    }
+    // Auth disabled - always authenticated
+    setIsAuthenticated(true)
     setIsLoading(false)
   }, [])
 
